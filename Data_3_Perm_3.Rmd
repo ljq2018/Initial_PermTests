@@ -1,0 +1,146 @@
+---
+title: "Data_3_Perm_3"
+author: "Lauren Quesada"
+date: "4/22/2022"
+output: pdf_document
+---
+
+# On Personal Computer
+X3 and X4 are impt but missing
+```{r}
+Data_Type_3 <- function(beta0, beta1, beta2, beta3, beta4, n_obs, rep){
+
+ ###Define Variables 
+ x1<- rnorm(n_obs) 
+ x2<- rnorm(n_obs)
+ x3<- rnorm(n_obs)
+ x4<- rnorm(n_obs)
+
+ y<- beta0 + beta1*x1 + beta2*x2 + beta3*x3 + beta4*x4 + rnorm(n_obs)
+
+ ###Regress Y on X1 and X2
+ obs_fit<- lm(y ~ x1 + x2)
+
+ #what values do we want to record?
+  output3 <- c(y,x1,x2)
+
+return(output3)
+}
+```
+
+Manly
+```{r}
+library(tidyverse)
+library(broom)
+
+Perm_Method_3 <- function(data) {
+  
+n_obs <- length(data)/3 
+y<- data[1:n_obs]
+x1<- data[(n_obs+1):(2*n_obs)]
+x2<- data[((2*n_obs)+1):(3*n_obs)]
+n_shuffle <- 100
+
+#1. Regress Y on X1 and X2
+obs_fit<- lm(y ~ x1 + x2)
+
+# Get parameter estimates b2, t_obs, and ols_pval for X2
+
+# This is the OLS p-value on x2 for the unpermuted data set
+ols_pval<- obs_fit %>% tidy() %>% 
+                filter(term =="x2") %>% 
+                select(p.value) %>% 
+                pull()
+
+# This is the observed t-statistic on x2 for the unpermuted data set
+ obs_t <-  obs_fit %>% tidy() %>% 
+             filter(term =="x2") %>% 
+             select(statistic) %>% 
+             pull()
+ 
+# This is the observed slope coefficient on x2 for the unpermuted data set
+ obs_b2 <- obs_fit %>% tidy() %>% 
+              filter(term =="x2") %>% 
+              select(estimate) %>% 
+              pull()
+
+   perm_t <- c()
+   
+ #  perm_b2 <- c()
+   
+ #  perm_pval <- c()
+
+   for(j in 1: n_shuffle) {
+  
+    #2. Permute Y
+    #3. Regress Y* on x1 and x2
+    full_perm_fit <- lm(sample(y) ~ x1 + x2)
+
+   # Get parameter estimates b2* of the permuted data
+    current_perm_b2 <- full_perm_fit %>% tidy() %>% 
+                  filter(term == "x2") %>% 
+                  select(estimate) %>% 
+                  pull()
+    
+    # Record these values of b2* for each permutation of the data set
+    # perm_b2 <- c(perm_b2, current_perm_b2)
+  
+    # Get the standard error of b2*, which will be used in the t*-statistic calculation
+    se_perm_b2 <- full_perm_fit %>% tidy() %>%
+                  filter(term == "x2") %>%
+                  select(std.error) %>%
+                  pull()
+    
+    # Calculate the t*-statistic
+    tstar <- (current_perm_b2 - 0)/se_perm_b2
+    
+    
+    # Record the t*-statistic for each permutation of the data set
+    perm_t <- c(perm_t, tstar)
+
+   }
+   
+#4. Repeat Steps 2-3 many times (m<n!); this is the purpose of the for(j in 1: n_shuffle)
+
+#5. Calculate the p-value based on the distribution of the observed t-statistic
+   #as compared to the distribution of the t*-statistic
+   #on average, how many times was our permuted t-statistic bigger than the observed?
+   perm_pval<- mean(abs(perm_t) > abs(obs_t))   
+  #End of the Monte Carlo Loop
+
+# Record these values for each data set and output them into a data frame
+output3 <- data.frame(obs_b2, obs_t, ols_pval, perm_pval)
+
+return(output3)
+}
+```
+
+```{r}
+b1 <- seq(from = 0, to = 1, by = 0.2)
+b2 <- seq(from = 0, to = 1, by = 0.2)
+b3 <- seq(from = 0, to = 1, by = 0.2)
+b4 <- seq(from = 0, to = 1, by = 0.2)
+n_obs <- seq(from = 15, to = 60, by = 15)
+rep <- c(1:5)
+big_b <- expand.grid(b1 = b1, b2 = b2, b3 = b3, b4 = b4, n_obs = n_obs, rep = rep)
+
+big_b1 <- big_b$b1
+big_b2 <- big_b$b2
+big_b3 <- big_b$b3
+big_b4 <- big_b$b4
+b0 <- rep(0, nrow(big_b))
+n_obs <- big_b$n_obs
+rep <- big_b$rep
+
+output_15 <- pmap(list(b0, big_b1, big_b2, big_b3, big_b4, n_obs,rep), Data_Type_3)
+```
+
+```{r}
+date()
+
+results_15 <- map_dfr(output_15, Perm_Method_3)
+
+full_out_3_3 <- cbind(big_b, results_15)
+
+date()
+```
