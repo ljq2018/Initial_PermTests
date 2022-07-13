@@ -1,0 +1,895 @@
+---
+title: "Visualizing_Sims"
+author: "Lauren Quesada"
+date: "4/23/2022"
+output: pdf_document
+---
+This is me grouping data!
+```{r}
+library(dplyr)
+library(tidyverse)
+
+```
+
+```{r}
+library(ggplot2)
+Full_Data_Thesis %>%
+  filter(b2 == 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + 
+  geom_smooth(se = FALSE, method = lm) +
+  geom_abline(intercept = 0, slope = 1) +
+  ggtitle("OLS vs Permutation for Beta2 = 0.0") +
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0.2) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + 
+  geom_smooth(se = FALSE, method = lm) +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 0.2") +
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0.4) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + 
+  geom_smooth(se = FALSE, method = lm) +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 0.4") +
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0.8) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + 
+  geom_smooth(se = FALSE, method = lm) +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 0.8") +
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 1.0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + 
+  geom_smooth(se = FALSE, method = lm) +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 1.0") +
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+sig <- 0.05
+
+Full_Data_Thesis %>%
+  filter(b2 == 0.2) %>%
+  filter(n_obs == 15) %>%
+  filter(data == "C") %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0.2, b1 != 0, b3 == 0, b4 == 0) %>%
+  filter(n_obs == 15) %>%
+  filter(method == "1a") %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_point() +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 0.2, n_obs =15, full_out_1_1a")
+
+Full_Data_Thesis %>%
+  filter(b2 != 0.0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(n_obs == 15) %>%
+  filter(method == "1a") %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_point() +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 0.2, n_obs =15, full_out_1_1a")
+
+Full_Data_Thesis %>%
+  filter(b2 == 0.2, b1 == 0, b3 != 0, b4 == 0) %>%
+  filter(n_obs == 15) %>%
+  filter(method == "1a") %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_point() +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 = 0.2, n_obs =15, full_out_1_1a")
+```
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 != 0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(n_obs == 15) %>%
+  filter(data == 1) %>%
+  filter(method == "2") %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0) +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 != 0, n_obs =15, full_out_1_1a")
+```
+***
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(method != "1b" & n_obs !=45) %>% #introduced this since perm 1b, data 1 was acting weird
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0) +
+  ggtitle("OLS vs Permutation for Beta2 = 0")+
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 != 0, b1 == 0, b3 == 0, b4 == 0) %>% 
+  filter(method != "2" & n_obs !=60) %>% #introduced this since perm 1b, data 1 was acting weird
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0) +
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 != 0")+
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0, b1 != 0, b3 == 0, b4 == 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0)+
+  ggtitle("OLS vs Permutation for Beta2 = 0, Beta1 != 0")+
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0, b1 == 0, b3 != 0, b4 == 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0) +
+  ggtitle("OLS vs Permutation for Beta2 = 0, Beta3 != 0")+
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 == 0, b1 == 0, b3 == 0, b4 != 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0)+
+  ggtitle("OLS vs Permutation for Beta2 = 0, Beta4 != 0")+
+  facet_grid(n_obs ~ method)
+```
+
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 != 0, b1 != 0, b3 == 0, b4 == 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0)+
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 != 0, Beta1 != 0")+
+  facet_grid(n_obs ~ method)
+```
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 != 0, b1 == 0, b3 != 0, b4 == 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0)+
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 != 0, Beta3 != 0")+
+  facet_grid(n_obs ~ method)
+```
+```{r}
+Full_Data_Thesis %>%
+  filter(b2 != 0, b1 == 0, b3 == 0, b4 != 0) %>%
+  ggplot(aes(x = ols_pval, y = perm_pval, color = factor(data))) + #add a color = b2 in here?
+  geom_smooth(method = "loess", se = FALSE)+
+  geom_abline(slope = 1, intercept = 0)+
+  coord_trans(x = "log10") +
+  ggtitle("OLS vs Permutation for Beta2 != 0, Beta4 != 0")+
+  facet_grid(n_obs ~ method)
+```
+***
+```{r}
+sig <- 0.05
+
+Full_Data_Thesis %>%
+  filter(b2 !=0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  group_by(method, as.factor(b2)) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig)) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+b2_2 <- Full_Data_Thesis %>%
+  filter(b2 == 0.2, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2)%>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+b2_4 <- Full_Data_Thesis %>%
+  filter(b2 == 0.4, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2)%>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+b2_6 <- Full_Data_Thesis %>%
+  filter(b2 == 0.6, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2)%>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+b2_8 <- Full_Data_Thesis %>%
+  filter(b2 == 0.8, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2)%>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+b2_1 <- Full_Data_Thesis %>%
+  filter(b2 == 1.0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = b2)%>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+power_15_1 <- rbind(b2_0, b2_2, b2_4, b2_6, b2_8, b2_1)
+power_15_1
+```
+
+```{r}
+Table_1_15 <-Full_Data_Thesis %>%
+  filter(b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+Table_1_60 <-Full_Data_Thesis %>%
+  filter(b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+```
+
+```{r}
+sig <- 0.05
+
+b2_0 <- Full_Data_Thesis %>%
+  filter(b2 == 0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+
+b2_2 <- Full_Data_Thesis %>%
+  filter(b2 == 0.2, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+
+b2_4 <- Full_Data_Thesis %>%
+  filter(b2 == 0.4, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+
+b2_6 <- Full_Data_Thesis %>%
+  filter(b2 == 0.6, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+
+b2_8 <- Full_Data_Thesis %>%
+  filter(b2 == 0.8, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+
+b2_1 <- Full_Data_Thesis %>%
+  filter(b2 == 1.0, b1 == 0, b3 == 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  group_by(method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig))
+
+power_60_1 <- rbind(b2_0, b2_2, b2_4, b2_6, b2_8, b2_1)
+power_60_1
+
+```
+```{r}
+
+temp <- Full_Data_Thesis %>%
+  filter( b1 == 0, b4 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+
+temp2 <- temp %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "Rejection Rate")
+
+
+#temp2 %>%
+#  ggplot(aes(x = b2, y = rej_rate)) + 
+#  geom_jitter(aes(color = b3, shape = approach), height = 0, width = .05)
+
+
+```
+
+N_obs = 15, b1 ==0, b4 ==0, b3 changes
+```{r}
+temp_15 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b4 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_15_2 <- temp_15 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_15_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+#N_obs = 60, b1 ==0, b4 ==0, b3 changes
+
+temp_60 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b4 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 60) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_60_2 <- temp_60 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_60_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+```
+
+N_obs = 15, b1 !=0, b4 ==0, b3 changes
+```{r}
+temp_15 <- Full_Data_Thesis %>%
+  filter( b1 != 0, b4 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_15_2 <- temp_15 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_15_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+#N_obs = 60, b1 ==0, b4 ==0, b3 changes
+
+temp_60 <- Full_Data_Thesis %>%
+  filter( b1 != 0, b4 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 60) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_60_2 <- temp_60 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_60_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+```
+
+N_obs = 15, b1 ==0, b4 !=0, b3 changes
+```{r}
+temp_15 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b4 != 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_15_2 <- temp_15 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_15_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+#N_obs = 60, b1 ==0, b4 ==0, b3 changes
+
+temp_60 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b4 != 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 60) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_60_2 <- temp_60 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_60_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+```
+
+N_obs = 15, b1 ==0, b3 ==0, b4 changes
+```{r}
+temp_15 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b3 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b4, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_15_2 <- temp_15 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_15_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b4), shape = Approach)) +
+  geom_line(aes(color = as.factor(b4), linetype = Approach)) +
+  labs(color = "b4") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+#N_obs = 60, b1 ==0, b4 ==0, b3 changes
+
+temp_60 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b3 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 60) %>%
+  group_by(b2, b4, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2))
+
+temp_60_2 <- temp_60 %>% pivot_longer(cols = ols_rej:perm_rej, names_to = "Approach", values_to = "rej_rate")
+
+temp_60_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b4), shape = Approach)) +
+  geom_line(aes(color = as.factor(b4), linetype = Approach)) +
+  labs(color = "b4") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method)
+
+```
+
+
+
+
+
+
+# I want to do this one
+1 & 9 (pink inside blue)
+```{r}
+#The first graph shows us the effect of having a non-zero b1, while the second graph shows us exactly what influence b1 has as it grows
+#b1 !=0, b4 = 0, b3=0
+
+#1
+temp_1 <- Full_Data_Thesis %>%
+  filter( b1 != 0, b3 == 0, b4 ==0) %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_1_2 <- temp_1 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+temp_1_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(shape = Approach)) +
+  geom_line(aes(linetype = Approach)) +
+  geom_hline(yintercept = 0.05) +
+  facet_grid(data ~ method) +
+  ggtitle("b1 != 0, b3 = 0, b4 = 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+#b4=0, b3 =0, b1 changes
+
+#9
+temp_9 <- Full_Data_Thesis %>%
+  filter( b4 == 0, b3 == 0) %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b1, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_9_2 <- temp_9 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+temp_9_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b1), shape = Approach)) +
+  geom_line(aes(color = as.factor(b1), linetype = Approach)) +
+  labs(color = "b1") + 
+  geom_hline(yintercept = 0.05) +
+  facet_grid(data ~ method) +
+  ggtitle("b3 = 0, b4 = 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+#what about when the only variable of interest, x2, is the only one with a non-zero coefficient?
+
+#2
+temp_2 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b3 == 0, b4 ==0) %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_2_2 <- temp_2 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+temp_2_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(shape = Approach)) +
+  geom_line(aes(linetype = Approach)) +
+  geom_hline(yintercept = 0.05) +
+  facet_grid(data ~ method) +
+  ggtitle("b1 = 0, b3 = 0, b4 = 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+```
+
+# I want to do this one to see how b1 varying in conjunction with b3 varying changes things (this is especiFull_Data_Thesisy relevant for data 2 where there is an interaction term)
+red dots
+```{r}
+#b1 = 0, b4 = 0, b3 changes
+#9
+temp_9 <- Full_Data_Thesis %>%
+  filter( b4 == 0, b3 == 0) %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b1, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_9_2 <- temp_9 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+temp_9_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b1), shape = Approach)) +
+  geom_line(aes(color = as.factor(b1), linetype = Approach)) +
+  labs(color = "b1") + 
+  geom_hline(yintercept = 0.05) +
+  facet_grid(data ~ method) +
+  ggtitle("b3 = 0, b4 = 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+#3
+temp_3 <- Full_Data_Thesis %>%
+  filter( b1 == 0, b4 == 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_3_2 <- temp_3 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+temp_3_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  facet_grid(data ~ method) +
+  ggtitle("b1 = 0, b4 = 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+#b1 = 0, b3 = 0, b4 changes (this should only be different for data 2)
+
+#4
+temp_4 <- Full_Data_Thesis %>%
+  filter( b1 != 0, b4 == 0) %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_4_2 <- temp_4 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+
+temp_4_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  facet_grid(data ~ method) +
+  ggtitle("b1 != 0, b4 = 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+#maybe one where nothing is zero, since we did one where everything was zero?
+
+#12
+temp_12 <- Full_Data_Thesis %>%
+  filter( b1 != 0, b4 != 0) %>%
+#  filter(data == 1) %>%
+#  filter(method == "1a") %>%
+  filter(n_obs == 15) %>%
+  group_by(b2, b3, data, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig), 
+            b2 = min(b2)) %>%
+  rename("OLS Rejection Rate" = ols_rej,"Permutation Rejection Rate" = perm_rej)
+
+temp_12_2 <- temp_12 %>% 
+  pivot_longer(cols = `OLS Rejection Rate`:`Permutation Rejection Rate`, names_to = "Approach", values_to = "rej_rate")
+
+temp_12_2 %>%
+  ggplot(aes(x = b2, y = rej_rate)) + 
+  geom_point(aes(color = as.factor(b3), shape = Approach)) +
+  geom_line(aes(color = as.factor(b3), linetype = Approach)) +
+  labs(color = "b3") + 
+  geom_hline(yintercept = 0.05) +
+  #ggtitle("Data b3 & b4, Method F&L")
+  facet_grid(data ~ method) +
+  ggtitle("b1 != 0, b4 != 0") +
+  theme(text = element_text(size=8)) +
+  ylab("Rejection Rate")
+
+```
+
+```{r}
+Table_1_15 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 15) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+Table_1_60 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == 1) %>%
+  filter(n_obs == 60) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+```
+
+```{r}
+Table_2_15 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == 2) %>%
+  filter(n_obs == 15) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+Table_2_60 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == 2) %>%
+  filter(n_obs == 60) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+```
+
+```{r}
+Table_3_15 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == 3) %>%
+  filter(n_obs == 15) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+Table_3_60 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == 3) %>%
+  filter(n_obs == 60) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+```
+
+```{r}
+Table_C_15 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == "C") %>%
+  filter(n_obs == 15) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+Table_C_60 <-Full_Data_Thesis %>%
+  filter(b1 != 0, b3 != 0, b4 == 0) %>%
+  filter(data == "C") %>%
+  filter(n_obs == 60) %>%
+  dplyr::group_by(b2, method) %>%
+  summarize(ols_rej = mean(ols_pval < sig),
+            perm_rej = mean(perm_pval < sig),
+            b2 = b2) %>%
+  summarize(ols_rej = mean(ols_rej),
+            perm_rej = mean(perm_rej))
+
+```
+
+```{r}
+Table_2_15 <- Table_2_15 %>% ungroup() %>% select(-`b2`, -method)
+Table_3_15 <- Table_3_15 %>% ungroup() %>% select(-`b2`, -method)
+Table_C_15 <- Table_C_15 %>% ungroup() %>% select(-`b2`, -method)
+Table_15_4 <- cbind(Table_1_15, Table_2_15, Table_3_15, Table_C_15) %>% rename(ols_rej_1 = ols_rej...3, perm_rej_1 = perm_rej...4, ols_rej_2 = ols_rej...5,perm_rej_2 = perm_rej...6,ols_rej_3 = ols_rej...7, perm_rej_3 = perm_rej...8, ols_rej_C = ols_rej...9, perm_rej_C = perm_rej...10)
+Table_15_4
+```
+
+```{r}
+Table_2_60 <- Table_2_60 %>% ungroup() %>% select(-`b2`, -method)
+Table_3_60 <- Table_3_60 %>% ungroup() %>% select(-`b2`, -method)
+Table_C_60 <- Table_C_60 %>% ungroup() %>% select(-`b2`, -method)
+Table_60_4<- cbind(Table_1_60, Table_2_60, Table_3_60, Table_C_60) %>% rename(ols_rej_1 = ols_rej...3, perm_rej_1 = perm_rej...4, ols_rej_2 = ols_rej...5,perm_rej_2 = perm_rej...6,ols_rej_3 = ols_rej...7, perm_rej_3 = perm_rej...8, ols_rej_C = ols_rej...9, perm_rej_C = perm_rej...10)
+Table_60_4
+```
+
+
+
+
+
+
+
